@@ -4,13 +4,15 @@ build: binny
 .PHONY: run
 run: pkged.go
 	go run main.go
-
-image.tar: Dockerfile
-	docker build -t binny .
-	docker save -o image.tar binny
+	docker run --rm binny hello
 	docker rmi binny
 
-pkged.go: image.tar
+image.tar.gz: Dockerfile
+	docker build -t binny .
+	docker save binny | gzip > image.tar.gz
+	docker rmi binny
+
+pkged.go: image.tar.gz
 	pkger
 
 binny: pkged.go *.go

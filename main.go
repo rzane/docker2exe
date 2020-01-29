@@ -10,13 +10,13 @@ import (
 )
 
 func main() {
-	info, err := pkger.Stat("/image.tar")
+	info, err := pkger.Stat("/image.tar.gz")
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("total bytes: %v\n", info.Size())
 
-	file, err := pkger.Open("/image.tar")
+	file, err := pkger.Open("/image.tar.gz")
 	if err != nil {
 		panic(err)
 	}
