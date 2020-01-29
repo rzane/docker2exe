@@ -9,27 +9,38 @@ import (
 	"github.com/markbates/pkger"
 )
 
+const (
+	ImageName    = "binny"
+	ImageTarball = "/image.tar.gz"
+	WorkingDir   = "/workdir"
+)
+
 func main() {
-	info, err := pkger.Stat("/image.tar.gz")
+	info, err := pkger.Stat(ImageTarball)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("total bytes: %v\n", info.Size())
 
-	file, err := pkger.Open("/image.tar.gz")
+	file, err := pkger.Open(ImageTarball)
 	if err != nil {
 		panic(err)
 	}
 	defer file.Close()
 
-	bytes, err := loadImage(file)
+	bytes, err := LoadImage(file)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("loaded bytes: %v\n", bytes)
+
+	err = ExecDocker(ImageName, os.Args[1:])
+	if err != nil {
+		panic(err)
+	}
 }
 
-func loadImage(input io.Reader) (int64, error) {
+func LoadImage(input io.Reader) (int64, error) {
 	cmd := exec.Command("docker", "load")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -55,4 +66,37 @@ func loadImage(input io.Reader) (int64, error) {
 	}
 
 	return bytes, cmd.Wait()
+}
+
+func ExecDocker(imageName string, imageArgs []string) error {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	args := []string{
+		"run",
+		"--rm",
+		// "-it",
+		"-v", fmt.Sprintf("%v:%v", cwd, WorkingDir),
+		"-w", WorkingDir,
+		imageName,
+	}
+	return Exec("docker", append(args, imageArgs...))
+}
+
+func Exec(name string, args []string) error {
+	cmd := exec.Command(name, args...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+	// exe, err := exec.LookPath(name)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// fmt.Printf("docker: %s\n", exe)
+	// fmt.Printf("args: %v\n", args)
+
+	// return syscall.Exec(exe, args, os.Environ())
 }

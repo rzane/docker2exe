@@ -6,12 +6,11 @@ build: $(TARGET)
 
 .PHONY: run
 run: $(TARGET)
-	./binny
-	docker run --rm binny hello
-	docker rmi binny
+	./binny hello
 
 .PHONY: clean
 clean:
+	docker rmi -f binny
 	rm -f image.tar.gz pkged.go $(TARGET)
 
 $(TARGET): $(SOURCES)
