@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"syscall"
 
 	"github.com/markbates/pkger"
 )
@@ -77,7 +78,7 @@ func ExecDocker(imageName string, imageArgs []string) error {
 	args := []string{
 		"run",
 		"--rm",
-		// "-it",
+		"-it",
 		"-v", fmt.Sprintf("%v:%v", cwd, WorkingDir),
 		"-w", WorkingDir,
 		imageName,
@@ -86,17 +87,12 @@ func ExecDocker(imageName string, imageArgs []string) error {
 }
 
 func Exec(name string, args []string) error {
-	cmd := exec.Command(name, args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
-	// exe, err := exec.LookPath(name)
-	// if err != nil {
-	// 	return err
-	// }
+	cmd, err := exec.LookPath(name)
+	if err != nil {
+		return err
+	}
 
-	// fmt.Printf("docker: %s\n", exe)
-	// fmt.Printf("args: %v\n", args)
-
-	// return syscall.Exec(exe, args, os.Environ())
+	env := os.Environ()
+	args = append([]string{cmd}, args...)
+	return syscall.Exec(cmd, args, env)
 }
