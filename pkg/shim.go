@@ -12,9 +12,9 @@ import (
 
 type Shim struct {
 	Image   string
+	Workdir string
 	Env     []string
 	Volumes []string
-	Workdir string
 	Stdout  io.Writer
 	Stderr  io.Writer
 }
