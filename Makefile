@@ -14,7 +14,7 @@ clean:
 	rm -f image.tar.gz pkged.go $(TARGET)
 
 $(TARGET): $(SOURCES)
-	go build -o binny main.go
+	go build -o binny
 
 image.tar.gz: Dockerfile
 	docker build -t binny .
