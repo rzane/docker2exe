@@ -6,7 +6,7 @@ build: $(TARGET)
 
 .PHONY: run
 run: $(TARGET)
-	./binny hello
+	./binny echo hello
 
 .PHONY: clean
 clean:

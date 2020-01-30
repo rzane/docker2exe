@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	binny "github.com/rzane/binny/pkg"
@@ -9,18 +10,14 @@ import (
 func main() {
 	config := binny.Config{
 		Image:   "binny",
+		Tarball: "/image.tar.gz",
 		Workdir: "/workdir",
 		Args:    os.Args[1:],
 		Env:     []string{},
 	}
 
-	err := binny.Load("/image.tar.gz")
-	if err != nil {
-		panic(err)
-	}
-
-	err = binny.Exec(config)
-	if err != nil {
-		panic(err)
+	if err := binny.Shim(config); err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
 	}
 }
