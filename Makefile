@@ -17,7 +17,7 @@ $(TARGET): $(SOURCES)
 	go build -o binny
 
 statik/statik.go: assets/image.tar.gz
-  statik -src=$(abspath assets)
+	statik -src=$(abspath assets)
 
 assets/image.tar.gz: Dockerfile
 	docker build -t binny .

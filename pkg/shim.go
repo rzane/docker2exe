@@ -20,8 +20,8 @@ func ensureImageExists(config Config) error {
 		return nil
 	}
 
-	if config.Load != "" {
-		file, err := config.FileSystem.Open(config.Load)
+	if config.Load {
+		file, err := config.Open()
 		if err != nil {
 			return errors.Wrap(err, "open file failed")
 		}
