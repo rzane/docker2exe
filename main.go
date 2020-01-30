@@ -16,7 +16,6 @@ func main() {
 		Load:    true,
 		Workdir: "/workdir",
 		Args:    os.Args[1:],
-		Env:     []string{},
 		Open: func() (http.File, error) {
 			statik, err := fs.New()
 			if err != nil {

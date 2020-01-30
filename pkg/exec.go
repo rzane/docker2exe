@@ -34,6 +34,10 @@ func assembleExecArgs(cmd string, config Config) ([]string, error) {
 		args = append(args, "-e", env)
 	}
 
+	for host, target := range config.Volumes {
+		args = append(args, "-v", fmt.Sprintf("%s:%s", host, target))
+	}
+
 	if config.Workdir != "" {
 		cwd, err := os.Getwd()
 		if err != nil {
