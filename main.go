@@ -7,7 +7,7 @@ import (
 	"os/exec"
 
 	"github.com/markbates/pkger"
-	"github.com/rzane/binny/pkg"
+	binny "github.com/rzane/binny/pkg"
 )
 
 const (
@@ -16,6 +16,13 @@ const (
 )
 
 func main() {
+	config := binny.Config{
+		Image:   "binny",
+		Workdir: "/workdir",
+		Args:    os.Args[1:],
+		Env:     []string{},
+	}
+
 	info, err := pkger.Stat(ImageTarball)
 	if err != nil {
 		panic(err)
@@ -34,13 +41,7 @@ func main() {
 	}
 	fmt.Printf("loaded bytes: %v\n", bytes)
 
-	opts := binny.ExecOptions{
-		Image:   "binny",
-		Workdir: "/workdir",
-		Args:    os.Args[1:],
-	}
-
-	err = binny.Exec(opts)
+	err = binny.Exec(config)
 	if err != nil {
 		panic(err)
 	}
