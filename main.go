@@ -11,11 +11,12 @@ import (
 
 func main() {
 	config := binny.Config{
-		Image:   "stackup",
-		Build:   "git@github.com:promptworks/stackup",
-		Workdir: "/workdir",
-		Args:    os.Args[1:],
-		Env:     []string{},
+		Image:      "binny",
+		Load:       "image.tar.gz",
+		FileSystem: assets,
+		Workdir:    "/workdir",
+		Args:       os.Args[1:],
+		Env:        []string{},
 	}
 
 	if err := binny.Shim(config); err != nil {

@@ -21,7 +21,13 @@ func ensureImageExists(config Config) error {
 	}
 
 	if config.Load != "" {
-		return errors.Wrap(LoadEmbedded(config.Load), "docker load failed")
+		file, err := config.FileSystem.Open(config.Load)
+		if err != nil {
+			return errors.Wrap(err, "open file failed")
+		}
+		defer file.Close()
+
+		return errors.Wrap(Load(file), "docker load failed")
 	}
 
 	if config.Build != "" {
