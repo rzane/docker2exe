@@ -1,5 +1,5 @@
 TARGET = binny
-SOURCES = assets.go $(wildcard *.go)
+SOURCES = statik/statik.go $(wildcard *.go)
 
 .PHONY: build
 build: $(TARGET)
@@ -11,13 +11,13 @@ run: $(TARGET)
 .PHONY: clean
 clean:
 	docker rmi binny --force 2>/dev/null
-	rm -rf binny assets/ assets.go
+	rm -rf binny assets/ statik/
 
 $(TARGET): $(SOURCES)
 	go build -o binny
 
-assets.go: assets/image.tar.gz
-	go generate
+statik/statik.go: assets/image.tar.gz
+  statik -src=$(abspath assets)
 
 assets/image.tar.gz: Dockerfile
 	docker build -t binny .
