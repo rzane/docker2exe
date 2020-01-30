@@ -1,5 +1,5 @@
 TARGET = binny
-SOURCES = $(wildcard *.go)
+SOURCES = assets.go $(wildcard *.go)
 
 .PHONY: build
 build: $(TARGET)
@@ -8,12 +8,19 @@ build: $(TARGET)
 run: $(TARGET)
 	./binny echo hello
 
-.PHONY: image
-image:
-	mkdir -p assets
-	docker build -t binny .
-	docker save binny | gzip > assets/image.tar.gz
-	docker rmi binny
+.PHONY: clean
+clean:
+	docker rmi binny --force 2>/dev/null
+	rm -rf binny assets/ assets.go
 
 $(TARGET): $(SOURCES)
 	go build -o binny
+
+assets.go: assets/image.tar.gz
+	go generate
+
+assets/image.tar.gz: Dockerfile
+	docker build -t binny .
+	mkdir -p assets
+	docker save binny | gzip > assets/image.tar.gz
+	docker rmi binny

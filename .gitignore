@@ -1,6 +1,3 @@
-/pkged.go
-/image.tar
-/image.tar.gz
 /binny
-/assets/image.tar.gz
-/assets_vfsdata.go
+/assets/
+/assets.go

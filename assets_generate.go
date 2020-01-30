@@ -4,13 +4,16 @@ package main
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/shurcooL/vfsgen"
 )
 
+var assets = http.Dir("assets")
+
 func main() {
 	err := vfsgen.Generate(assets, vfsgen.Options{
-		BuildTags: "!dev",
+		Filename: "assets.go",
 	})
 
 	if err != nil {

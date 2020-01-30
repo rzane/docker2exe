@@ -1,4 +1,4 @@
-//go:generate go run assets_generate.go assets.go
+//go:generate go run assets_generate.go
 
 package main
 
@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	_ "github.com/shurcooL/vfsgen"
 	binny "github.com/rzane/binny/pkg"
 )
 
