@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/markbates/pkger"
 	binny "github.com/rzane/binny/pkg"
 )
 
 func main() {
 	config := binny.Config{
-		Image:   "binny",
-		Load:    pkger.Include("/image.tar.gz"),
+		Image:   "stackup",
+		Build:   "git@github.com:promptworks/stackup",
 		Workdir: "/workdir",
 		Args:    os.Args[1:],
 		Env:     []string{},

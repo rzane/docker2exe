@@ -7,6 +7,7 @@ import (
 	"syscall"
 
 	"github.com/mattn/go-isatty"
+	"github.com/pkg/errors"
 )
 
 func Exec(config Config) error {

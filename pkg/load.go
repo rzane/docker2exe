@@ -6,15 +6,10 @@ import (
 	"os/exec"
 
 	"github.com/markbates/pkger"
+	"github.com/pkg/errors"
 )
 
-func Load(filename string) error {
-	file, err := pkger.Open(filename)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
+func Load(file io.Reader) error {
 	cmd := exec.Command("docker", "load")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -40,4 +35,17 @@ func Load(filename string) error {
 	}
 
 	return cmd.Wait()
+}
+
+func LoadEmbedded(filename string) error {
+	file, err := pkger.Open(filename)
+	if err != nil {
+		return errors.Wrap(err, "open image failed")
+	}
+	defer file.Close()
+
+	if err := Load(file); err != nil {
+		return errors.Wrap(err, "load failed")
+	}
+	return nil
 }

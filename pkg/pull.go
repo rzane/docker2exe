@@ -5,8 +5,8 @@ import (
 	"os/exec"
 )
 
-func Build(config Config) error {
-	cmd := exec.Command("docker", "build", "-t", config.Image, config.Build)
+func Pull(image string) error {
+	cmd := exec.Command("docker", "pull", image)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
