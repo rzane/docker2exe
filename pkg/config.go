@@ -7,8 +7,8 @@ type Config struct {
 	Image   string
 	Args    []string
 	Env     []string
+	Volumes []string
 	Workdir string
-	Volumes map[string]string
 	Load    bool
 	Open    func() (http.File, error)
 }
