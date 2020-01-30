@@ -1,38 +1,114 @@
 package binny
 
 import (
+	"fmt"
+	"io"
+	"os"
 	"os/exec"
+	"syscall"
 
-	"github.com/pkg/errors"
+	"github.com/mattn/go-isatty"
 )
 
-func Shim(config Config) error {
-	if err := ensureImageExists(config); err != nil {
+type Shim struct {
+	Image   string
+	Env     []string
+	Volumes []string
+	Workdir string
+	Stdout  io.Writer
+	Stderr  io.Writer
+}
+
+func (shim *Shim) Exists() bool {
+	cmd := exec.Command("docker", "inspect", shim.Image)
+	if err := cmd.Run(); err != nil {
+		return false
+	}
+	return true
+}
+
+func (shim *Shim) Pull() error {
+	cmd := exec.Command("docker", "pull", shim.Image)
+	cmd.Stdout = shim.Stdout
+	cmd.Stderr = shim.Stderr
+	return cmd.Run()
+}
+
+func (shim *Shim) Build(context string) error {
+	cmd := exec.Command("docker", "build", "-t", shim.Image, context)
+	cmd.Stdout = shim.Stdout
+	cmd.Stderr = shim.Stderr
+	return cmd.Run()
+}
+
+func (shim *Shim) Load(file io.Reader) error {
+	cmd := exec.Command("docker", "load")
+	cmd.Stdout = shim.Stdout
+	cmd.Stderr = shim.Stderr
+
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
 		return err
 	}
 
-	return Exec(config)
+	err = cmd.Start()
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(stdin, file)
+	if err != nil {
+		return err
+	}
+
+	err = stdin.Close()
+	if err != nil {
+		return err
+	}
+
+	return cmd.Wait()
 }
 
-func ensureImageExists(config Config) error {
-	inspect := exec.Command("docker", "inspect", config.Image)
-	if err := inspect.Run(); err == nil {
-		return nil
+func (shim *Shim) Exec(containerArgs []string) error {
+	cmd, err := exec.LookPath("docker")
+	if err != nil {
+		return err
 	}
 
-	if config.Load {
-		file, err := config.Open()
+	args, err := shim.assembleRunArgs()
+	if err != nil {
+		return err
+	}
+
+	args = append([]string{cmd}, args...)
+	args = append(args, containerArgs...)
+	return syscall.Exec(cmd, args, os.Environ())
+}
+
+func (shim *Shim) assembleRunArgs() ([]string, error) {
+	args := []string{"run", "--rm"}
+
+	if isatty.IsTerminal(os.Stdout.Fd()) {
+		args = append(args, "-it")
+	}
+
+	for _, env := range shim.Env {
+		args = append(args, "-e", env)
+	}
+
+	for _, volume := range shim.Volumes {
+		args = append(args, "-v", volume)
+	}
+
+	if shim.Workdir != "" {
+		cwd, err := os.Getwd()
 		if err != nil {
-			return errors.Wrap(err, "open file failed")
+			return nil, err
 		}
-		defer file.Close()
 
-		return errors.Wrap(Load(file), "docker load failed")
+		args = append(args, "-w", shim.Workdir)
+		args = append(args, "-v", fmt.Sprintf("%s:%s", cwd, shim.Workdir))
 	}
 
-	if config.Build != "" {
-		return errors.Wrap(Build(config), "docker build failed")
-	}
-
-	return errors.Wrap(Pull(config.Image), "docker pull failed")
+	return append(args, shim.Image), nil
 }
