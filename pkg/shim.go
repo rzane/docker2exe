@@ -3,15 +3,25 @@ package binny
 import "os/exec"
 
 func Shim(config Config) error {
-	if !isLoaded(config.Image) {
-		if err := Load(config.Load); err != nil {
-			return err
+	if !isExistingImage(config.Image) {
+		if config.Load != "" {
+			err := Load(config.Load)
+			if err != nil {
+				return err
+			}
+		}
+
+		if config.Build != "" {
+			err := Build(config)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
 	return Exec(config)
 }
 
-func isLoaded(image string) bool {
+func isExistingImage(image string) bool {
 	return exec.Command("docker", "inspect", image).Run() == nil
 }
