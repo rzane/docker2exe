@@ -5,13 +5,12 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"syscall"
 
 	"github.com/markbates/pkger"
+	"github.com/rzane/binny/pkg"
 )
 
 const (
-	ImageName    = "binny"
 	ImageTarball = "/image.tar.gz"
 	WorkingDir   = "/workdir"
 )
@@ -35,7 +34,13 @@ func main() {
 	}
 	fmt.Printf("loaded bytes: %v\n", bytes)
 
-	err = ExecDocker(ImageName, os.Args[1:])
+	opts := binny.ExecOptions{
+		Image:   "binny",
+		Workdir: "/workdir",
+		Args:    os.Args[1:],
+	}
+
+	err = binny.Exec(opts)
 	if err != nil {
 		panic(err)
 	}
@@ -67,32 +72,4 @@ func LoadImage(input io.Reader) (int64, error) {
 	}
 
 	return bytes, cmd.Wait()
-}
-
-func ExecDocker(imageName string, imageArgs []string) error {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	args := []string{
-		"run",
-		"--rm",
-		"-it",
-		"-v", fmt.Sprintf("%v:%v", cwd, WorkingDir),
-		"-w", WorkingDir,
-		imageName,
-	}
-	return Exec("docker", append(args, imageArgs...))
-}
-
-func Exec(name string, args []string) error {
-	cmd, err := exec.LookPath(name)
-	if err != nil {
-		return err
-	}
-
-	env := os.Environ()
-	args = append([]string{cmd}, args...)
-	return syscall.Exec(cmd, args, env)
 }
