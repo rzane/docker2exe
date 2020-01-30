@@ -4,7 +4,7 @@ import "os/exec"
 
 func Shim(config Config) error {
 	if !isLoaded(config.Image) {
-		if err := Load(config.Tarball); err != nil {
+		if err := Load(config.Load); err != nil {
 			return err
 		}
 	}

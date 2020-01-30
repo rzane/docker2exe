@@ -1,7 +1,7 @@
 package binny
 
 type Config struct {
-	Tarball string
+	Load    string
 	Image   string
 	Args    []string
 	Env     []string

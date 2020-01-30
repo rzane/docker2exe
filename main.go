@@ -11,7 +11,7 @@ import (
 func main() {
 	config := binny.Config{
 		Image:   "binny",
-		Tarball: pkger.Include("/image.tar.gz"),
+		Load:    pkger.Include("/image.tar.gz"),
 		Workdir: "/workdir",
 		Args:    os.Args[1:],
 		Env:     []string{},
