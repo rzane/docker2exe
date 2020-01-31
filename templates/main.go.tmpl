@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"fmt"
+	"io/ioutil"
 
 {{- if .Embed}}
 	_ "{{.Module}}/statik"
@@ -16,6 +17,8 @@ func main() {
 		Workdir: "{{.Workdir}}",
 		Env: {{printf "%#v" .Env}},
 		Volumes: {{printf "%#v" .Volumes}},
+		Stdout: ioutil.Discard,
+		Stderr: os.Stderr,
 	}
 
 	if err := run(shim); err != nil {
@@ -48,7 +51,7 @@ func run(shim Shim) error {
 			return err
 		}
 	{{else}}
-		err := shim.Pull("{{.Image}}")
+		err := shim.Pull()
 		if err != nil {
 			return err
 		}
