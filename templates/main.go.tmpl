@@ -5,14 +5,13 @@ import (
 	"fmt"
 
 {{- if .Embed}}
-	_ "./statik"
+	_ "{{.Module}}/statik"
 	"github.com/rakyll/statik/fs"
 {{- end}}
-	binny "github.com/rzane/binny/pkg"
 )
 
 func main() {
-	shim := binny.Shim{
+	shim := Shim{
 		Image: "{{.Image}}",
 		Workdir: "{{.Workdir}}",
 		Env: {{printf "%#v" .Env}},
@@ -20,12 +19,12 @@ func main() {
 	}
 
 	if err := run(shim); err != nil {
-		fmt.Fprintln(err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
 
-func run(shim binny.Shim) error {
+func run(shim Shim) error {
 	if !shim.Exists() {
 	{{- if .Embed}}
 		statik, err := fs.New()

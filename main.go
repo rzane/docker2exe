@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	"os/user"
 
 	"github.com/rzane/binny/gen"
 	"github.com/urfave/cli/v2"
@@ -46,6 +48,9 @@ func main() {
 				Aliases: []string{"v"},
 				Usage:   "bind mount a volume",
 			},
+			&cli.StringFlag{
+				Name: "module",
+			},
 		},
 	}
 
@@ -54,6 +59,7 @@ func main() {
 
 func generate(c *cli.Context) error {
 	opts := gen.Options{
+		Module:  c.String("module"),
 		Name:    c.String("name"),
 		Image:   c.String("image"),
 		Build:   c.String("build"),
@@ -61,6 +67,11 @@ func generate(c *cli.Context) error {
 		Workdir: c.String("workdir"),
 		Env:     c.StringSlice("env"),
 		Volumes: c.StringSlice("volume"),
+	}
+
+	if opts.Module == "" {
+		user, _ := user.Current()
+		opts.Module = fmt.Sprintf("github.com/%s/%s", user.Username, opts.Name)
 	}
 
 	return gen.Generate(opts)
