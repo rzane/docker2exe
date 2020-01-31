@@ -2,6 +2,10 @@
 
 This tool can be used to convert a Docker image to an executable that you can send to your friends!
 
+## Installation
+
+Download a binary from the [releases page](https://github.com/rzane/docker2exe/releases).
+
 ## Usage
 
 To create a new binary:
