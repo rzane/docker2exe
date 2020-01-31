@@ -1,4 +1,4 @@
-module github.com/rzane/binny
+module github.com/rzane/docker2exe
 
 go 1.13
 

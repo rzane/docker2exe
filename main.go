@@ -6,13 +6,13 @@ import (
 	"os/user"
 	"path"
 
-	"github.com/rzane/binny/gen"
+	"github.com/rzane/docker2exe/cmd"
 	"github.com/urfave/cli/v2"
 )
 
 func main() {
 	app := &cli.App{
-		Name:   "binny",
+		Name:   "docker2exe",
 		Usage:  "create an executable from a docker image",
 		Action: generate,
 		Flags: []cli.Flag{
@@ -72,7 +72,7 @@ func main() {
 }
 
 func generate(c *cli.Context) error {
-	opts := gen.Options{
+	generator := cmd.Generator{
 		Output:  c.String("output"),
 		Name:    c.String("name"),
 		Targets: c.StringSlice("target"),
@@ -85,19 +85,19 @@ func generate(c *cli.Context) error {
 		Volumes: c.StringSlice("volume"),
 	}
 
-	if opts.Output == "" {
+	if generator.Output == "" {
 		cwd, _ := os.Getwd()
-		opts.Output = path.Join(cwd, "pkg")
+		generator.Output = path.Join(cwd, "dist")
 	}
 
-	if opts.Module == "" {
+	if generator.Module == "" {
 		user, _ := user.Current()
-		opts.Module = fmt.Sprintf("github.com/%s/%s", user.Username, opts.Name)
+		generator.Module = fmt.Sprintf("github.com/%s/%s", user.Username, generator.Name)
 	}
 
-	if len(opts.Targets) == 0 {
-		opts.Targets = []string{"darwin/amd64", "linux/amd64", "windows/amd64"}
+	if len(generator.Targets) == 0 {
+		generator.Targets = []string{"darwin/amd64", "linux/amd64", "windows/amd64"}
 	}
 
-	return gen.Generate(opts)
+	return generator.Run()
 }

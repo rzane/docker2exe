@@ -1,4 +1,4 @@
-package gen
+package cmd
 
 import (
 	"io/ioutil"
@@ -11,7 +11,7 @@ import (
 
 var templates = template.Must(template.ParseGlob("templates/*"))
 
-type Options struct {
+type Generator struct {
 	Name    string
 	Output  string
 	Targets []string
@@ -24,13 +24,13 @@ type Options struct {
 	Volumes []string
 }
 
-func Generate(opts Options) error {
-	tmp, err := ioutil.TempDir("", opts.Name)
+func (gen *Generator) Run() error {
+	tmp, err := ioutil.TempDir("", gen.Name)
 	if err != nil {
 		return err
 	}
 
-	if err := copyTemplates(tmp, opts); err != nil {
+	if err := gen.copyTemplates(tmp); err != nil {
 		return err
 	}
 
@@ -41,15 +41,7 @@ func Generate(opts Options) error {
 	return os.RemoveAll(tmp)
 }
 
-func make(cwd string) error {
-	cmd := exec.Command("make")
-	cmd.Dir = cwd
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
-}
-
-func copyTemplates(dest string, opts Options) error {
+func (gen *Generator) copyTemplates(dest string) error {
 	for _, template := range templates.Templates() {
 		filename := strings.TrimRight(template.Name(), ".tmpl")
 		filepath := path.Join(dest, filename)
@@ -60,11 +52,19 @@ func copyTemplates(dest string, opts Options) error {
 		}
 		defer file.Close()
 
-		err = template.Execute(file, opts)
+		err = template.Execute(file, gen)
 		if err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+func make(cwd string) error {
+	cmd := exec.Command("make")
+	cmd.Dir = cwd
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
 }
