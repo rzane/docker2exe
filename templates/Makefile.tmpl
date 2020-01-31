@@ -7,7 +7,7 @@ SOURCES = statik/statik.go go.sum $(wildcard *.go)
 {{- else}}
 SOURCES = go.sum $(wildcard *.go)
 {{- end}}
-TARGETS = darwin/amd64 linux/amd64 windows/amd64
+TARGETS ={{range .Targets}} {{.}}{{end}}
 
 os = $(word 1, $(subst /, ,$@))
 arch = $(word 2, $(subst /, ,$@))

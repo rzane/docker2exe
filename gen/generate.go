@@ -14,6 +14,7 @@ var templates = template.Must(template.ParseGlob("templates/*"))
 type Options struct {
 	Name    string
 	Output  string
+	Targets []string
 	Module  string
 	Image   string
 	Embed   bool

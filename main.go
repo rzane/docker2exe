@@ -53,6 +53,11 @@ func main() {
 				Name:  "output",
 				Usage: "directory to output",
 			},
+			&cli.StringSliceFlag{
+				Name:    "target",
+				Aliases: []string{"t"},
+				Usage:   "platforms and architectures to target",
+			},
 			&cli.StringFlag{
 				Name:  "module",
 				Usage: "name of generated golang module",
@@ -60,14 +65,18 @@ func main() {
 		},
 	}
 
-	app.Run(os.Args)
+	if err := app.Run(os.Args); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 }
 
 func generate(c *cli.Context) error {
 	opts := gen.Options{
 		Output:  c.String("output"),
-		Module:  c.String("module"),
 		Name:    c.String("name"),
+		Targets: c.StringSlice("target"),
+		Module:  c.String("module"),
 		Image:   c.String("image"),
 		Build:   c.String("build"),
 		Embed:   c.Bool("embed"),
@@ -84,6 +93,10 @@ func generate(c *cli.Context) error {
 	if opts.Module == "" {
 		user, _ := user.Current()
 		opts.Module = fmt.Sprintf("github.com/%s/%s", user.Username, opts.Name)
+	}
+
+	if len(opts.Targets) == 0 {
+		opts.Targets = []string{"darwin/amd64", "linux/amd64", "windows/amd64"}
 	}
 
 	return gen.Generate(opts)
