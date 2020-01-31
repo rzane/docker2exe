@@ -1,21 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"os"
-	"text/template"
 
+	"github.com/rzane/binny/gen"
 	"github.com/urfave/cli/v2"
 )
-
-type options struct {
-	Image   string
-	Embed   bool
-	Build   string
-	Workdir string
-	Env     []string
-	Volumes []string
-}
 
 func main() {
 	app := &cli.App{
@@ -23,6 +13,11 @@ func main() {
 		Usage:  "create an executable from a docker image",
 		Action: generate,
 		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Required: true,
+				Name:     "name",
+				Usage:    "name of your executable",
+			},
 			&cli.StringFlag{
 				Required: true,
 				Name:     "image",
@@ -58,22 +53,8 @@ func main() {
 }
 
 func generate(c *cli.Context) error {
-	opts := parseOptions(c)
-	out := mainTemplate()
-
-	tmpl := template.New("main")
-	tmpl, err := tmpl.Parse(out)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	fmt.Printf("%+v\n", opts)
-	tmpl.Execute(os.Stdout, opts)
-	return nil
-}
-
-func parseOptions(c *cli.Context) options {
-	return options{
+	opts := gen.Options{
+		Name:    c.String("name"),
 		Image:   c.String("image"),
 		Build:   c.String("build"),
 		Embed:   c.Bool("embed"),
@@ -81,36 +62,6 @@ func parseOptions(c *cli.Context) options {
 		Env:     c.StringSlice("env"),
 		Volumes: c.StringSlice("volume"),
 	}
-}
 
-func mainTemplate() string {
-	return `package main
-
-import (
-  "os"
-  "fmt"
-  binny "github.com/rzane/binny/pkg"
-)
-
-func main() {
-  shim := binny.Shim{
-    Image: "{{.Image}}",
-    Workdir: "{{.Workdir}}",
-  }
-
-  if !shim.Exists() {
-    err := shim.Build("{{.Build}}")
-    if err != nil {
-      fmt.Fprintln(err)
-      os.Exit(1)
-    }
-  }
-
-  err := shim.Exec(os.Args[1:])
-  if err != nil {
-    fmt.Fprintln(err)
-    os.Exit(1)
-  }
-}
-`
+	return gen.Generate(opts)
 }
