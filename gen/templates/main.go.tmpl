@@ -1,25 +1,4 @@
-package gen
-
-import (
-	"bytes"
-	"text/template"
-)
-
-func render(name string, input string, data interface{}) string {
-	var output bytes.Buffer
-
-	tmpl := template.New(name)
-	tmpl = template.Must(tmpl.Parse(input))
-	err := tmpl.Execute(&output, data)
-	if err != nil {
-		panic(err)
-	}
-
-	return output.String()
-}
-
-func renderMain(opts Options) string {
-	input := `package main
+package main
 
 import (
 	"os"
@@ -78,8 +57,4 @@ func run(shim binny.Shim) error {
 	}
 
 	return shim.Exec(os.Args[1:])
-}
-`
-
-	return render("main", input, opts)
 }
