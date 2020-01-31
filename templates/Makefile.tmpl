@@ -1,0 +1,34 @@
+NAME = {{.Name}}
+OUTPUT = {{.Output}}
+MODULE = {{.Module}}
+IMAGE = {{.Image}}
+{{- if .Embed}}
+SOURCES = statik/statik.go go.sum $(wildcard *.go)
+{{- else}}
+SOURCES = go.sum $(wildcard *.go)
+{{- end}}
+TARGETS = darwin/amd64 linux/amd64 windows/amd64
+
+os = $(word 1, $(subst /, ,$@))
+arch = $(word 2, $(subst /, ,$@))
+
+.PHONY: all
+all: $(TARGETS)
+
+go.mod:
+	go mod init $(MODULE)
+
+go.sum: go.mod
+	go get
+{{- if .Embed}}
+
+assets/image.tar.gz:
+	mkdir -p assets
+	docker save $(IMAGE) | gzip > assets/image.tar.gz
+
+statik/statik.go: assets/image.tar.gz
+	statik -Z -src=assets
+{{- end}}
+
+$(TARGETS): $(SOURCES)
+	GOOS=$(os) GOARCH=$(arch) go build -o "$(OUTPUT)/$(NAME)-$(os)-$(arch)"

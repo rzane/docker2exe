@@ -49,7 +49,12 @@ func main() {
 				Usage:   "bind mount a volume",
 			},
 			&cli.StringFlag{
-				Name: "module",
+				Name:  "output",
+				Usage: "directory to output",
+			},
+			&cli.StringFlag{
+				Name:  "module",
+				Usage: "name of generated golang module",
 			},
 		},
 	}
@@ -59,6 +64,7 @@ func main() {
 
 func generate(c *cli.Context) error {
 	opts := gen.Options{
+		Output:  c.String("output"),
 		Module:  c.String("module"),
 		Name:    c.String("name"),
 		Image:   c.String("image"),
@@ -67,6 +73,11 @@ func generate(c *cli.Context) error {
 		Workdir: c.String("workdir"),
 		Env:     c.StringSlice("env"),
 		Volumes: c.StringSlice("volume"),
+	}
+
+	if opts.Output == "" {
+		cwd, _ := os.Getwd()
+		opts.Output = cwd
 	}
 
 	if opts.Module == "" {
