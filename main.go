@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/user"
+	"path"
 
 	"github.com/rzane/binny/gen"
 	"github.com/urfave/cli/v2"
@@ -77,7 +78,7 @@ func generate(c *cli.Context) error {
 
 	if opts.Output == "" {
 		cwd, _ := os.Getwd()
-		opts.Output = cwd
+		opts.Output = path.Join(cwd, "pkg")
 	}
 
 	if opts.Module == "" {

@@ -22,13 +22,18 @@ go.sum: go.mod
 	go get
 {{- if .Embed}}
 
-assets/image.tar.gz:
-	mkdir -p assets
+assets:
+	mkdir assets
+
+assets/image.tar.gz: assets
 	docker save $(IMAGE) | gzip > assets/image.tar.gz
 
 statik/statik.go: assets/image.tar.gz
 	statik -Z -src=assets
 {{- end}}
 
-$(TARGETS): $(SOURCES)
+$(OUTPUT):
+	mkdir $(OUTPUT)
+
+$(TARGETS): $(SOURCES) $(OUTPUT)
 	GOOS=$(os) GOARCH=$(arch) go build -o "$(OUTPUT)/$(NAME)-$(os)-$(arch)"
