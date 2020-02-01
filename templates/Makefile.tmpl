@@ -29,6 +29,7 @@ assets/image.tar.gz: assets
 	docker save $(IMAGE) | gzip > assets/image.tar.gz
 
 statik/statik.go: assets/image.tar.gz
+	go get github.com/rakyll/statik
 	statik -Z -src=assets
 {{- end}}
 
