@@ -18,7 +18,6 @@ type Generator struct {
 	Module  string
 	Image   string
 	Embed   bool
-	Build   string
 	Workdir string
 	Env     []string
 	Volumes []string

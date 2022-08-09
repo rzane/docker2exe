@@ -30,10 +30,6 @@ func (shim *Shim) Pull() error {
 	return shim.docker("pull", shim.Image).Run()
 }
 
-func (shim *Shim) Build(context string) error {
-	return shim.docker("build", "-t", shim.Image, context).Run()
-}
-
 func (shim *Shim) Load(file io.Reader) error {
 	cmd := shim.docker("docker", "load")
 

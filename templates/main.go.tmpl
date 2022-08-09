@@ -43,11 +43,6 @@ func run(shim Shim) error {
 		if err != nil {
 			return err
 		}
-	{{else if .Build}}
-		err := shim.Build("{{.Build}}")
-		if err != nil {
-			return err
-		}
 	{{else}}
 		err := shim.Pull()
 		if err != nil {

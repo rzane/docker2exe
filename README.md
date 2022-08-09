@@ -28,16 +28,6 @@ When the executable is run, we'll check for the `alpine:3.9.5` image on the user
 
     $ docker pull alpine:3.9.5
 
-### Building Docker images
-
-In this mode, if the specified image doesn't exist, we'll attempt to build it.
-
-    $ docker2exe --name myapp --image myapp:1.0 --build git@github.com:myuser/myapp
-
-When the executable is run, we'll check for the `myapp:1.0` image on the user's system. If it doesn't exist, the executable will automatically run:
-
-    $ docker build -t myapp:1.0 git@github.com:myuser/myapp
-
 ### Embedded Mode
 
 In this mode, if the specified image doesn't exist, we'll attempt to load it from a tarball that is embeddded in the executable.

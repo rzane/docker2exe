@@ -31,10 +31,6 @@ func main() {
 				Usage: "embed a docker image in the binary",
 			},
 			&cli.StringFlag{
-				Name:  "build",
-				Usage: "build a docker image upon install",
-			},
-			&cli.StringFlag{
 				Name:    "workdir",
 				Aliases: []string{"w"},
 				Usage:   "mount the user's current directory in the image",
@@ -78,7 +74,6 @@ func generate(c *cli.Context) error {
 		Targets: c.StringSlice("target"),
 		Module:  c.String("module"),
 		Image:   c.String("image"),
-		Build:   c.String("build"),
 		Embed:   c.Bool("embed"),
 		Workdir: c.String("workdir"),
 		Env:     c.StringSlice("env"),
