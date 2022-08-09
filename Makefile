@@ -13,19 +13,20 @@ arch = $(word 2, $(subst /, ,$@))
 .PHONY: all
 all: $(TARGETS)
 
+.PHONY: clean
+clean:
+	$(RM) -rf dist
+
 .PHONY: test
 test: all
-	dist/docker2exe-$(OS)-$(ARCH) --name alpine --image alpine
-	dist/alpine-$(OS)-$(ARCH) echo OK
-	dist/docker2exe-$(OS)-$(ARCH) --name alpine-embed --image alpine --embed
-	dist/alpine-embed-$(OS)-$(ARCH) echo OK
+	dist/docker2exe-$(OS)-$(ARCH) --name test --image alpine
+	dist/test-$(OS)-$(ARCH) echo OK
+	dist/docker2exe-$(OS)-$(ARCH) --name test-embed --image alpine --embed
+	dist/test-embed-$(OS)-$(ARCH) echo OK
 
 .PHONY: release
-release: all
-	hub release create $(VERSION) \
-		-a dist/docker2exe-linux-amd64 \
-		-a dist/docker2exe-darwin-amd64 \
-		-a dist/docker2exe-windows-amd64
+release: clean all
+	gh release create $(VERSION) dist/docker2exe-*
 
 $(OUTPUT):
 	mkdir $(OUTPUT)
