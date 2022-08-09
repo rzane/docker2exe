@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"embed"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
@@ -27,20 +26,16 @@ type Generator struct {
 }
 
 func (gen *Generator) Run() error {
-	tmp, err := ioutil.TempDir("", gen.Name)
+	tmp, err := os.MkdirTemp("", gen.Name)
 	if err != nil {
 		return err
 	}
+	defer os.RemoveAll(tmp)
 
 	if err := gen.copyTemplates(tmp); err != nil {
 		return err
 	}
-
-	if err := make(tmp); err != nil {
-		return err
-	}
-
-	return os.RemoveAll(tmp)
+	return make(tmp)
 }
 
 func (gen *Generator) copyTemplates(dest string) error {
