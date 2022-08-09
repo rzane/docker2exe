@@ -6,6 +6,10 @@ This tool can be used to convert a Docker image to an executable that you can se
 
 Download a binary from the [releases page](https://github.com/rzane/docker2exe/releases).
 
+    $ mv docker2exe-darwin-amd64 docker2exe
+    $ chmod +x docker2exe
+    $ ./docker2exe --help
+
 ## Usage
 
 To create a new binary:
