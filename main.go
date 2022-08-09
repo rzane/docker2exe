@@ -91,7 +91,7 @@ func generate(c *cli.Context) error {
 	}
 
 	if len(generator.Targets) == 0 {
-		generator.Targets = []string{"darwin/amd64", "linux/amd64", "windows/amd64"}
+		generator.Targets = []string{"darwin/amd64", "darwin/arm64", "linux/amd64", "windows/amd64"}
 	}
 
 	return generator.Run()
