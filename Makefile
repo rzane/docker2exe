@@ -1,6 +1,6 @@
 NAME = docker2exe
 OUTPUT = dist
-VERSION = v0.2.0
+VERSION = v0.2.1
 SOURCES = $(wildcard *.go)
 TARGETS = darwin/amd64 darwin/arm64 linux/amd64 windows/amd64
 
