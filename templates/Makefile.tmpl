@@ -3,7 +3,7 @@ OUTPUT = {{.Output}}
 MODULE = {{.Module}}
 IMAGE = {{.Image}}
 {{- if .Embed}}
-SOURCES = statik/statik.go go.sum $(wildcard *.go)
+SOURCES = go.sum $(wildcard *.go) image.tar.gz
 {{- else}}
 SOURCES = go.sum $(wildcard *.go)
 {{- end}}
@@ -21,18 +21,9 @@ go.mod:
 
 go.sum: go.mod
 	go get
-{{- if .Embed}}
 
-assets:
-	mkdir assets
-
-assets/image.tar.gz: assets
-	$(DOCKER) save $(IMAGE) | gzip > assets/image.tar.gz
-
-statik/statik.go: assets/image.tar.gz
-	go get github.com/rakyll/statik
-	statik -Z -src=assets
-{{- end}}
+image.tar.gz:
+	$(DOCKER) save $(IMAGE) | gzip > image.tar.gz
 
 $(OUTPUT):
 	mkdir $(OUTPUT)

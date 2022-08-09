@@ -4,12 +4,15 @@ import (
 	"os"
 	"fmt"
 	"io/ioutil"
-
 {{- if .Embed}}
-	_ "{{.Module}}/statik"
-	"github.com/rakyll/statik/fs"
+	"embed"
 {{- end}}
 )
+
+{{- if .Embed}}
+//go:embed image.tar.gz
+var embedded embed.FS
+{{- end}}
 
 func main() {
 	shim := Shim{
@@ -30,18 +33,13 @@ func main() {
 func run(shim Shim) error {
 	if !shim.Exists() {
 	{{- if .Embed}}
-		statik, err := fs.New()
+		image, err := embedded.Open("image.tar.gz")
 		if err != nil {
 			return err
 		}
+		defer image.Close()
 
-		file, err := statik.Open("/image.tar.gz")
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-
-		err = shim.Load(file)
+		err = shim.Load(image)
 		if err != nil {
 			return err
 		}
