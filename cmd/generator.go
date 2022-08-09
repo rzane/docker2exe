@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"embed"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -9,7 +10,9 @@ import (
 	"text/template"
 )
 
-var templates = template.Must(template.ParseGlob("templates/*"))
+//go:embed templates/*
+var templateRoot embed.FS
+var templates = template.Must(template.ParseFS(templateRoot, "*/*"))
 
 type Generator struct {
 	Name    string
