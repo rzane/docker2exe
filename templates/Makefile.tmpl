@@ -8,6 +8,7 @@ SOURCES = statik/statik.go go.sum $(wildcard *.go)
 SOURCES = go.sum $(wildcard *.go)
 {{- end}}
 TARGETS ={{range .Targets}} {{.}}{{end}}
+DOCKER ?= docker
 
 os = $(word 1, $(subst /, ,$@))
 arch = $(word 2, $(subst /, ,$@))
@@ -26,7 +27,7 @@ assets:
 	mkdir assets
 
 assets/image.tar.gz: assets
-	docker save $(IMAGE) | gzip > assets/image.tar.gz
+	$(DOCKER) save $(IMAGE) | gzip > assets/image.tar.gz
 
 statik/statik.go: assets/image.tar.gz
 	go get github.com/rakyll/statik

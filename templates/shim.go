@@ -20,31 +20,22 @@ type Shim struct {
 }
 
 func (shim *Shim) Exists() bool {
-	cmd := exec.Command("docker", "inspect", shim.Image)
-	if err := cmd.Run(); err != nil {
-		return false
-	}
-	return true
+	cmd := shim.docker("inspect", shim.Image)
+	cmd.Stdout = nil
+	cmd.Stderr = nil
+	return cmd.Run() == nil
 }
 
 func (shim *Shim) Pull() error {
-	cmd := exec.Command("docker", "pull", shim.Image)
-	cmd.Stdout = shim.Stdout
-	cmd.Stderr = shim.Stderr
-	return cmd.Run()
+	return shim.docker("pull", shim.Image).Run()
 }
 
 func (shim *Shim) Build(context string) error {
-	cmd := exec.Command("docker", "build", "-t", shim.Image, context)
-	cmd.Stdout = shim.Stdout
-	cmd.Stderr = shim.Stderr
-	return cmd.Run()
+	return shim.docker("build", "-t", shim.Image, context).Run()
 }
 
 func (shim *Shim) Load(file io.Reader) error {
-	cmd := exec.Command("docker", "load")
-	cmd.Stdout = shim.Stdout
-	cmd.Stderr = shim.Stderr
+	cmd := shim.docker("docker", "load")
 
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
@@ -70,9 +61,9 @@ func (shim *Shim) Load(file io.Reader) error {
 }
 
 func (shim *Shim) Exec(containerArgs []string) error {
-	cmd, err := exec.LookPath("docker")
-	if err != nil {
-		return err
+	cmd := shim.docker()
+	if cmd.Err != nil {
+		return cmd.Err
 	}
 
 	args, err := shim.assembleRunArgs()
@@ -80,9 +71,21 @@ func (shim *Shim) Exec(containerArgs []string) error {
 		return err
 	}
 
-	args = append([]string{cmd}, args...)
+	args = append([]string{cmd.Path}, args...)
 	args = append(args, containerArgs...)
-	return syscall.Exec(cmd, args, os.Environ())
+	return syscall.Exec(cmd.Path, args, os.Environ())
+}
+
+func (shim *Shim) docker(arg ...string) *exec.Cmd {
+	name := os.Getenv("DOCKER")
+	if name == "" {
+		name = "docker"
+	}
+
+	cmd := exec.Command(name, arg...)
+	cmd.Stdout = shim.Stdout
+	cmd.Stderr = shim.Stderr
+	return cmd
 }
 
 func (shim *Shim) assembleRunArgs() ([]string, error) {
