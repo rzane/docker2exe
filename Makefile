@@ -1,6 +1,6 @@
 NAME = docker2exe
 OUTPUT = dist
-VERSION = v0.1.1
+VERSION = v0.2.0
 SOURCES = $(wildcard *.go)
 TARGETS = darwin/amd64 darwin/arm64 linux/amd64 windows/amd64
 
@@ -26,7 +26,7 @@ test: all
 
 .PHONY: release
 release: clean all
-	gh release create $(VERSION) dist/docker2exe-*
+	gh release create $(VERSION) dist/docker2exe-* --generate-notes
 
 $(OUTPUT):
 	mkdir $(OUTPUT)
