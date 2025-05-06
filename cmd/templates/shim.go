@@ -15,6 +15,7 @@ type Shim struct {
 	Workdir string
 	Env     []string
 	Volumes []string
+	Ports   string
 	Stdout  io.Writer
 	Stderr  io.Writer
 }
@@ -97,6 +98,10 @@ func (shim *Shim) assembleRunArgs() ([]string, error) {
 
 	for _, volume := range shim.Volumes {
 		args = append(args, "-v", volume)
+	}
+
+	if shim.Ports != "" {
+		args = append(args, "-p", shim.Ports)
 	}
 
 	if shim.Workdir != "" {

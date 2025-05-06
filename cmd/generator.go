@@ -23,6 +23,7 @@ type Generator struct {
 	Workdir string
 	Env     []string
 	Volumes []string
+	Ports   string
 }
 
 func (gen *Generator) Run() error {

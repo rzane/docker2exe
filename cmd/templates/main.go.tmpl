@@ -20,6 +20,7 @@ func main() {
 		Workdir: "{{.Workdir}}",
 		Env: {{printf "%#v" .Env}},
 		Volumes: {{printf "%#v" .Volumes}},
+        Ports: "{{.Ports}}",
 		Stdout: ioutil.Discard,
 		Stderr: os.Stderr,
 	}

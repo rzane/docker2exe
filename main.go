@@ -55,6 +55,10 @@ func main() {
 				Usage:   "platforms and architectures to target",
 			},
 			&cli.StringFlag{
+				Name:  "ports",
+				Usage: "ports to use",
+			},
+			&cli.StringFlag{
 				Name:  "module",
 				Usage: "name of generated golang module",
 			},
@@ -77,6 +81,7 @@ func generate(c *cli.Context) error {
 		Embed:   c.Bool("embed"),
 		Workdir: c.String("workdir"),
 		Env:     c.StringSlice("env"),
+		Ports:   c.String("ports"),
 		Volumes: c.StringSlice("volume"),
 	}
 
